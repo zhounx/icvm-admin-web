@@ -4,6 +4,7 @@ import Home from './views/Home.vue'
 import Main from './views/Main.vue'
 import SalesPlan from './views/nav1/SalesPlan.vue'
 import SalesGoods from './views/nav1/SalesGoods.vue'
+import SalesChannel from './views/nav1/SalesChannel.vue'
 import Table from './views/nav1/Table.vue'
 import Form from './views/nav1/Form.vue'
 import user from './views/nav1/user.vue'
@@ -34,9 +35,8 @@ let routes = [
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/salesPlan', component: SalesPlan, name: '营销计划' },
+            { path: '/salesChannel', component: SalesChannel, name: '营销渠道' },
             { path: '/salesGoods', component: SalesGoods, name: '营销商品' },
-            { path: '/form', component: Form, name: 'Form' },
-            { path: '/user', component: user, name: 'List' },
         ]
     },
     // {

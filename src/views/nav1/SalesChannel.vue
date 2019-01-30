@@ -4,10 +4,13 @@
         <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
             <el-form :inline="true" :model="filters">
                 <el-form-item>
-                    <el-input v-model="filters.name" placeholder="请输入计划名称"></el-input>
+                    <el-input v-model="filters.name" placeholder="请输入渠道名称"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" v-on:click="getPlans">查询</el-button>
+                    <el-input v-model="filters.plan" placeholder="请输入计划名称"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" v-on:click="getChannels">查询</el-button>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="handleAdd">新增</el-button>
@@ -16,30 +19,33 @@
         </el-col>
 
         <!--列表-->
-        <el-table :data="plans" highlight-current-row v-loading="listLoading" @selection-change="selsChange"
+        <el-table :data="channels" highlight-current-row v-loading="listLoading" @selection-change="selsChange"
                   style="width: 100%;">
             <el-table-column type="selection" width="55">
             </el-table-column>
             <!--<el-table-column type="index" width="60">-->
             <!--</el-table-column>-->
-            <el-table-column prop="id" label="计划ID" width="100" sortable>
+            <el-table-column prop="id" label="渠道ID" width="100" sortable>
             </el-table-column>
-            <el-table-column prop="name" label="计划名称" min-width="200" sortable>
+            <el-table-column prop="name" label="渠道名称" width="200" sortable>
             </el-table-column>
-            <el-table-column prop="channelAmount" label="渠道数量" width="200" sortable>
+            <el-table-column prop="plan" label="营销计划" min-width="200" sortable>
             </el-table-column>
-            <el-table-column prop="cost" label="营销费用" width="150" sortable>
+            <el-table-column prop="resource" label="投放资源位" width="150" sortable>
             </el-table-column>
-            <el-table-column prop="goal" label="营销目标" width="150" :formatter="formatGoal" sortable>
+            <el-table-column prop="good" label="出池商品数" width="150" sortable>
             </el-table-column>
-            <el-table-column prop="goodsPool" label="营销商品池" width="150" sortable>
+            <el-table-column prop="rate" label="渠道核销率" width="150" :formatter="formatRate" sortable>
             </el-table-column>
-            <el-table-column prop="time" label="操作时间" width="150" sortable>
+            <el-table-column prop="ticketGrid" label="已发放券量/金额" width="200" sortable>
             </el-table-column>
-            <el-table-column label="操作" width="150">
+            <el-table-column prop="volumeGrid" label="核销量/金额" width="200" sortable>
+            </el-table-column>
+            <el-table-column label="操作" width="200">
                 <template slot-scope="scope">
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
                     <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                    <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">暂停</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -55,31 +61,24 @@
         <!--修改界面-->
         <el-dialog title="修改" v-model="editFormVisible" :close-on-click-modal="false">
             <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-                <el-form-item label="计划名称" prop="name">
-                    <el-input v-model="editForm.name" auto-complete="off"></el-input>
+                <el-form-item label="渠道" prop="name">
+                    <el-input v-model="editForm.name" auto-complete="off" placeholder="请输入渠道名称"></el-input>
                 </el-form-item>
-                <el-form-item label="营销费用">
-                    <el-input-number v-model="editForm.cost" :min="0" :max="20000"></el-input-number>
-                </el-form-item>
-                <el-form-item label="营销目标">
-                    <el-select v-model="editForm.goal" placeholder="请选择">
+                <el-form-item label="营销计划">
+                    <el-select v-model="editForm.plan" placeholder="请选择">
                         <el-option
-                                v-for="item in goalOptions"
+                                v-for="item in planOptions"
                                 :key="item.value"
                                 :label="item.label"
                                 :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="营销商品池">
-                    <el-select v-model="editForm.goodsPool" placeholder="请选择">
-                        <el-option
-                                v-for="item in poolOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
+                <el-form-item label="投放资源位">
+                    <el-input-number v-model="editForm.resource" :min="0" :max="20000" placeholder="请输入投放资源位"></el-input-number>
+                </el-form-item>
+                <el-form-item label="出池商品数">
+                    <el-input-number v-model="editForm.good" :min="0" :max="20000" placeholder="请输入出池商品数"></el-input-number>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -91,31 +90,24 @@
         <!--新增界面-->
         <el-dialog title="新增营销计划" v-model="addFormVisible" :close-on-click-modal="false">
             <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-                <el-form-item label="计划名称" prop="name">
-                    <el-input v-model="addForm.name" auto-complete="off"></el-input>
+                <el-form-item label="渠道" prop="name">
+                    <el-input v-model="addForm.name" auto-complete="off" placeholder="请输入渠道名称"></el-input>
                 </el-form-item>
-                <el-form-item label="营销费用">
-                    <el-input-number v-model="addForm.cost" :min="0" :max="20000"></el-input-number>
-                </el-form-item>
-                <el-form-item label="营销目标">
-                    <el-select v-model="addForm.goal" placeholder="请选择">
+                <el-form-item label="营销计划">
+                    <el-select v-model="addForm.plan" placeholder="请选择">
                         <el-option
-                                v-for="item in goalOptions"
+                                v-for="item in planOptions"
                                 :key="item.value"
                                 :label="item.label"
                                 :value="item.value">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="营销商品池">
-                    <el-select v-model="addForm.goodsPool" placeholder="请选择">
-                        <el-option
-                                v-for="item in poolOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
+                <el-form-item label="投放资源位">
+                    <el-input-number v-model="addForm.resource" :min="0" :max="20000" placeholder="请输入投放资源位"></el-input-number>
+                </el-form-item>
+                <el-form-item label="出池商品数">
+                    <el-input-number v-model="addForm.good" :min="0" :max="20000" placeholder="请输入出池商品数"></el-input-number>
                 </el-form-item>
 
             </el-form>
@@ -157,7 +149,7 @@
 <script>
     import util from '../../common/js/util'
     //import NProgress from 'nprogress'
-    import { removePlan, batchRemovePlan, editPlan, addPlan, getPlanListPage} from '../../api/api';
+    import { removeChannel, batchRemoveChannel, editChannel, addChannel, getChannelListPage} from '../../api/api';
 
     export default {
         data() {
@@ -165,7 +157,7 @@
                 filters: {
                     name: ''
                 },
-                plans: [],
+                channels: [],
                 total: 0,
                 page: 1,
                 listLoading: false,
@@ -181,9 +173,9 @@
                 //编辑界面数据
                 editForm: {
                     name: '',
-                    cost: -1,
-                    goal: 1,
-                    goodsPool: 100,
+                    plan: '双十一特惠',
+                    resource: 0,
+                    good: 0,
                 },
 
                 addFormVisible: false,//新增界面是否显示
@@ -196,29 +188,19 @@
                 //新增界面数据
                 addForm: {
                     name: '',
-                    cost: -1,
-                    goal: 1,
-                    goodsPool: 100,
+                    plan: '双十一特惠',
+                    resource: 0,
+                    good: 0,
                 },
 
-                goalOptions: [
+                planOptions: [
                     {
-                        value: '1',
-                        label: '利润',
+                        value: '双十一特惠',
+                        label: '双十一特惠',
                     },
                     {
-                        value: '0',
-                        label: '非利润',
-                    },
-                ],
-                poolOptions: [
-                    {
-                        value: '100',
-                        label: '100',
-                    },
-                    {
-                        value: '200',
-                        label: '200',
+                        value: '双十二特惠',
+                        label: '双十二特惠',
                     },
                 ],
 
@@ -226,39 +208,25 @@
         },
         methods: {
             //营销目标显示转换
-            formatGoal: function (row, column) {
-                return row.goal == 1 ? '利润' : row.goal == 0 ? '非利润' : '未知';
+            formatRate: function (row, column) {
+                return `${row.rate}%`
             },
             handleCurrentChange(val) {
                 this.page = val;
-                this.getPlans();
+                this.getChannels();
             },
-            //获取用户列表
-            // getUsers() {
-            //     let para = {
-            //         page: this.page,
-            //         name: this.filters.name
-            //     };
-            //     this.listLoading = true;
-            //     //NProgress.start();
-            //     getUserListPage(para).then((res) => {
-            //         this.total = res.data.total;
-            //         this.users = res.data.users;
-            //         this.listLoading = false;
-            //         //NProgress.done();
-            //     });
-            //
-            // },
-            getPlans() {
+            //获取渠道列表
+            getChannels() {
                 let para = {
                     page: this.page,
-                    name: this.filters.name
+                    name: this.filters.name,
+                    plan: this.filters.plan,
                 };
                 this.listLoading = true;
                 //NProgress.start();
-                getPlanListPage(para).then((res) => {
+                getChannelListPage(para).then((res) => {
                     this.total = res.data.total;
-                    this.plans = res.data.plans;
+                    this.channels = res.data.channels;
                     this.listLoading = false;
                     //NProgress.done();
                 });
@@ -271,14 +239,14 @@
                     this.listLoading = true;
                     //NProgress.start();
                     let para = {id: row.id};
-                    removePlan(para).then((res) => {
+                    removeChannel(para).then((res) => {
                         this.listLoading = false;
                         //NProgress.done();
                         this.$message({
                             message: '删除成功',
                             type: 'success'
                         });
-                        this.getPlans();
+                        this.getChannels();
                     });
                 }).catch(() => {
 
@@ -309,7 +277,7 @@
                             //NProgress.start();
                             let para = Object.assign({}, this.editForm);
                             // para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-                            editPlan(para).then((res) => {
+                            editChannel(para).then((res) => {
                                 this.editLoading = false;
                                 //NProgress.done();
                                 this.$message({
@@ -318,7 +286,7 @@
                                 });
                                 this.$refs['editForm'].resetFields();
                                 this.editFormVisible = false;
-                                this.getPlans();
+                                this.getChannels();
                             });
                         });
                     }
@@ -334,7 +302,7 @@
                             //NProgress.start();
                             let para = Object.assign({}, this.addForm);
                             // para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-                            addPlan(para).then((res) => {
+                            addChannel(para).then((res) => {
                                 this.addLoading = false;
                                 //NProgress.done();
                                 this.$message({
@@ -343,7 +311,7 @@
                                 });
                                 this.$refs['addForm'].resetFields();
                                 this.addFormVisible = false;
-                                this.getPlans();
+                                this.getChannels();
                             });
                         });
                     }
@@ -362,14 +330,14 @@
                     this.listLoading = true;
                     //NProgress.start();
                     let para = {ids};
-                    batchRemovePlan(para).then((res) => {
+                    batchRemoveChannel(para).then((res) => {
                         this.listLoading = false;
                         //NProgress.done();
                         this.$message({
                             message: '删除成功',
                             type: 'success'
                         });
-                        this.getPlans();
+                        this.getChannels();
                     });
                 }).catch(() => {
 
@@ -378,7 +346,7 @@
         },
         mounted() {
             // this.getUsers();
-            this.getPlans()
+            this.getChannels()
         }
     }
 
