@@ -111,13 +111,10 @@ export default {
         });
         //编辑计划
         mock.onGet('/plan/edit').reply(config => {
-            let {name,cost,goal,goodsPool,id} = config.params;
+            let {name,id} = config.params;
             _Plans.some(item => {
                 if (item.id === id) {
                     item.name = name;
-                    item.cost = cost;
-                    item.goal = goal;
-                    item.goodsPlan = goodsPool;
                     return true;
                 }
             });
@@ -132,9 +129,10 @@ export default {
         });
         //获取营销计划列表（分页）
         mock.onGet('/plan/queryListPage').reply(config => {
-            let {page, name} = config.params;
+            let {page, name,goal} = config.params;
             let mockPlans = _Plans.filter(plan => {
-                if (name && plan.name.indexOf(name) === -1) return false;
+                console.log(plan.goal,goal)
+                if (name && plan.name.indexOf(name) === -1 && goal!=undefined && plan.goal==goal) return false;
                 return true;
             });
             let total = mockPlans.length;
@@ -239,12 +237,12 @@ export default {
 
         //新增商品
         mock.onGet('/good/add').reply(config => {
-            let {name,cost,goal,goodsPool } = config.params;
+            let {name,price,gpr,stock } = config.params;
             _Goods.push({
                 name,
-                cost,
-                goal,
-                goodsPool
+                price,
+                gpr,
+                stock
             });
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
@@ -285,13 +283,13 @@ export default {
         });
         //编辑商品
         mock.onGet('/good/edit').reply(config => {
-            let {name,cost,goal,goodsPool,id} = config.params;
+            let {name,price,gpr,stock,id} = config.params;
             _Goods.some(item => {
                 if (item.id === id) {
                     item.name = name;
-                    item.cost = cost;
-                    item.goal = goal;
-                    item.goodsPlan = goodsPool;
+                    item.price = price;
+                    item.gpr = gpr;
+                    item.stock = stock;
                     return true;
                 }
             });

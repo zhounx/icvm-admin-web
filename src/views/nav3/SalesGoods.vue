@@ -30,15 +30,15 @@
             </el-table-column>
             <!--<el-table-column type="index" width="60">-->
             <!--</el-table-column>-->
-            <el-table-column prop="id" label="计划ID" width="100" sortable hidden>
+            <el-table-column prop="id" label="商品ID" width="100" sortable hidden>
             </el-table-column>
-            <el-table-column prop="name" label="名称" min-width="200" sortable>
+            <el-table-column prop="name" label="商品名称" min-width="200" sortable>
             </el-table-column>
             <el-table-column prop="price" label="售价" width="200" :formatter="formatPrice" sortable>
             </el-table-column>
-            <el-table-column prop="costPrice" label="成本" width="150" :formatter="formatPrice" sortable>
-            </el-table-column>
-            <el-table-column prop="discount" label="营销折扣" width="150" :formatter="formatPrice" sortable>
+            <!--<el-table-column prop="costPrice" label="成本" width="150" :formatter="formatPrice" sortable>-->
+            <!--</el-table-column>-->
+            <el-table-column prop="gpr" label="毛利率" width="150" :formatter="formatPercent" sortable>
             </el-table-column>
             <el-table-column prop="stock" label="库存数量" width="150" sortable>
             </el-table-column>
@@ -65,23 +65,17 @@
         <!--编辑界面-->
         <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
             <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-                <el-form-item label="姓名" prop="name">
+                <el-form-item label="商品名称" prop="name">
                     <el-input v-model="editForm.name" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="性别">
-                    <el-radio-group v-model="editForm.sex">
-                        <el-radio class="radio" :label="1">男</el-radio>
-                        <el-radio class="radio" :label="0">女</el-radio>
-                    </el-radio-group>
+                <el-form-item label="售价">
+                    <el-input-number v-model="editForm.price" :min="0" :max="999999"></el-input-number>
                 </el-form-item>
-                <el-form-item label="年龄">
-                    <el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
+                <el-form-item label="毛利率">
+                    <el-input-number v-model="editForm.gpr" :min="-100" :max="100"></el-input-number>
                 </el-form-item>
-                <el-form-item label="生日">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input type="textarea" v-model="editForm.addr"></el-input>
+                <el-form-item label="库存数量">
+                    <el-input-number v-model="editForm.stock" :min="0" :max="999999"></el-input-number>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -93,23 +87,17 @@
         <!--新增界面-->
         <el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
             <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-                <el-form-item label="姓名" prop="name">
-                    <el-input v-model="addForm.name" auto-complete="off"></el-input>
+                <el-form-item label="商品名称" prop="name">
+                    <el-input v-model="editForm.name" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="性别">
-                    <el-radio-group v-model="addForm.sex">
-                        <el-radio class="radio" :label="1">男</el-radio>
-                        <el-radio class="radio" :label="0">女</el-radio>
-                    </el-radio-group>
+                <el-form-item label="售价">
+                    <el-input-number v-model="editForm.price" :min="0" :max="999999"></el-input-number>
                 </el-form-item>
-                <el-form-item label="年龄">
-                    <el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
+                <el-form-item label="毛利率">
+                    <el-input-number v-model="editForm.gpr" :min="-100" :max="100"></el-input-number>
                 </el-form-item>
-                <el-form-item label="生日">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input type="textarea" v-model="addForm.addr"></el-input>
+                <el-form-item label="库存数量">
+                    <el-input-number v-model="editForm.stock" :min="0" :max="999999"></el-input-number>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -148,10 +136,9 @@
                 editForm: {
                     id: 0,
                     name: '',
-                    sex: -1,
-                    age: 0,
-                    birth: '',
-                    addr: ''
+                    price: -1,
+                    gpr: 0,
+                    stock: '',
                 },
 
                 addFormVisible: false,//新增界面是否显示
@@ -164,19 +151,23 @@
                 //新增界面数据
                 addForm: {
                     name: '',
-                    sex: -1,
-                    age: 0,
-                    birth: '',
-                    addr: ''
+                    price: -1,
+                    gpr: 0,
+                    stock: '',
                 }
 
             }
         },
         methods: {
-            //性别显示转换
+            //价格显示转换
             formatPrice: function (row, column) {
                 let value = row.price || row.costPrice || row.discount
                 return `￥ ${value}`
+            },
+            //百分比显示转换
+            formatPercent: function (row, column) {
+                let value = row.gpr
+                return `${value}%`
             },
             handleCurrentChange(val) {
                 this.page = val;

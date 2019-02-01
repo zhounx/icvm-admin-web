@@ -6,7 +6,7 @@ const LoginUsers = [
         username: 'admin',
         password: '123456',
         avatar: 'https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png',
-        name: 'felixyang'
+        name: 'nxzhou'
     }
 ];
 
@@ -26,7 +26,7 @@ for (let i = 0; i < 25; i++) {
     Plans.push(Mock.mock({
         id: i + 1,
         name: `双十一特惠${i + 1}`,
-        'channelAmount|10-100': 1,
+        'adAmount|10-100': 1,
         'cost|1000-5000': 1,
         goal: i > 2 ? 1 : 0,
         'goodsPool|500-1000': 1,
@@ -53,7 +53,7 @@ for (let i = 0; i < 25; i++) {
         name: `商品${i + 1}`,
         'price|10-100': 1,
         'costPrice|1-5': 1,
-        'discount|2-5': 1,
+        'gpr|2-5': 1,
         'stock|1000-5000': 1,
         time: Mock.Random.date(),
         operator: Mock.Random.cname()

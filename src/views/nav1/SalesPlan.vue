@@ -6,6 +6,16 @@
                 <el-form-item>
                     <el-input v-model="filters.name" placeholder="请输入计划名称"></el-input>
                 </el-form-item>
+                <el-form-item label="营销目标">
+                <el-select v-model="filters.goal" placeholder="请选择">
+                <el-option
+                v-for="item in goalOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+                </el-option>
+                </el-select>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-on:click="getPlans">查询</el-button>
                 </el-form-item>
@@ -26,7 +36,7 @@
             </el-table-column>
             <el-table-column prop="name" label="计划名称" min-width="200" sortable>
             </el-table-column>
-            <el-table-column prop="channelAmount" label="渠道数量" width="200" sortable>
+            <el-table-column prop="adAmount" label="广告数量" width="200" sortable>
             </el-table-column>
             <el-table-column prop="cost" label="营销费用" width="150" sortable>
             </el-table-column>
@@ -39,10 +49,11 @@
             <el-table-column label="操作" width="150">
                 <template slot-scope="scope">
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-                    <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+                    <!--<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>-->
                 </template>
             </el-table-column>
         </el-table>
+
 
         <!--工具条-->
         <el-col :span="24" class="toolbar">
@@ -58,29 +69,29 @@
                 <el-form-item label="计划名称" prop="name">
                     <el-input v-model="editForm.name" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="营销费用">
-                    <el-input-number v-model="editForm.cost" :min="0" :max="20000"></el-input-number>
-                </el-form-item>
-                <el-form-item label="营销目标">
-                    <el-select v-model="editForm.goal" placeholder="请选择">
-                        <el-option
-                                v-for="item in goalOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="营销商品池">
-                    <el-select v-model="editForm.goodsPool" placeholder="请选择">
-                        <el-option
-                                v-for="item in poolOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+                <!--<el-form-item label="营销费用">-->
+                    <!--<el-input-number v-model="editForm.cost" :min="0" :max="20000"></el-input-number>-->
+                <!--</el-form-item>-->
+                <!--<el-form-item label="营销目标">-->
+                    <!--<el-select v-model="editForm.goal" placeholder="请选择">-->
+                        <!--<el-option-->
+                                <!--v-for="item in goalOptions"-->
+                                <!--:key="item.value"-->
+                                <!--:label="item.label"-->
+                                <!--:value="item.value">-->
+                        <!--</el-option>-->
+                    <!--</el-select>-->
+                <!--</el-form-item>-->
+                <!--<el-form-item label="营销商品池">-->
+                    <!--<el-select v-model="editForm.goodsPool" placeholder="请选择">-->
+                        <!--<el-option-->
+                                <!--v-for="item in poolOptions"-->
+                                <!--:key="item.value"-->
+                                <!--:label="item.label"-->
+                                <!--:value="item.value">-->
+                        <!--</el-option>-->
+                    <!--</el-select>-->
+                <!--</el-form-item>-->
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click.native="editFormVisible = false">取消</el-button>
@@ -163,7 +174,8 @@
         data() {
             return {
                 filters: {
-                    name: ''
+                    name: '',
+                    goal:''
                 },
                 plans: [],
                 total: 0,
@@ -181,9 +193,9 @@
                 //编辑界面数据
                 editForm: {
                     name: '',
-                    cost: -1,
-                    goal: 1,
-                    goodsPool: 100,
+                    // cost: -1,
+                    // goal: 1,
+                    // goodsPool: 100,
                 },
 
                 addFormVisible: false,//新增界面是否显示
@@ -224,6 +236,9 @@
 
             }
         },
+        components:{
+
+        },
         methods: {
             //营销目标显示转换
             formatGoal: function (row, column) {
@@ -252,7 +267,8 @@
             getPlans() {
                 let para = {
                     page: this.page,
-                    name: this.filters.name
+                    name: this.filters.name,
+                    goal:this.filters.goal
                 };
                 this.listLoading = true;
                 //NProgress.start();

@@ -4,11 +4,11 @@
 			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
 				{{collapsed?'':sysName}}
 			</el-col>
-			<el-col :span="10">
-				<div class="tools" @click.prevent="toggleCollapse">
-					<i class="fa fa-align-justify"></i>
-				</div>
-			</el-col>
+			<!--<el-col :span="10">-->
+				<!--<div class="tools" @click.prevent="toggleCollapse">-->
+					<!--<i class="fa fa-align-justify"></i>-->
+				<!--</div>-->
+			<!--</el-col>-->
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
 					<span class="el-dropdown-link userinfo-inner">
@@ -23,19 +23,28 @@
 				</el-dropdown>
 			</el-col>
 		</el-col>
+
 		<el-col :span="24" class="main">
 			<aside :class="collapsed?'menu-collapsed':'menu-expanded'">
 				<!--导航菜单-->
 				<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect"
 					 unique-opened router :class="collapsed?'hide':'show'">
+
 					<template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
-						<el-submenu :index="index+''" v-if="!item.leaf">
+						<!--若子路由不止一个，则可展开此导航栏分组-->
+						<el-submenu :index="index+''" v-if="item.children.length>1">
+							<!--父级菜单名字和图标-->
 							<template slot="title"><i :class="item.iconCls"></i>{{item.name}}</template>
+							<!--遍历子集菜单-->
 							<el-menu-item v-for="child in item.children" :index="child.path" :key="child.path" v-if="!child.hidden">{{child.name}}</el-menu-item>
 						</el-submenu>
-						<el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
+
+						<el-menu-item v-else :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
+
 					</template>
 				</el-menu>
+
+
 				<!--导航菜单-折叠后-->
 				<ul class="el-menu el-menu-vertical-demo collapsed">
 					<li v-for="(item,index) in $router.options.routes" v-if="!item.hidden" class="el-submenu item">
@@ -45,11 +54,11 @@
 								<li v-for="child in item.children" v-if="!child.hidden" :key="child.path" class="el-menu-item" style="padding-left: 40px;" :class="$route.path==child.path?'is-active':''" @click="$router.push(child.path)">{{child.name}}</li>
 							</ul>
 						</template>
-						<template v-else>
+						<ul v-else>
 							<li class="el-submenu">
 								<div class="el-submenu__title el-menu-item" style="padding-left: 20px;height: 56px;line-height: 56px;padding: 0 20px;" :class="$route.path==item.children[0].path?'is-active':''" @click="$router.push(item.children[0].path)"><i :class="item.iconCls"></i></div>
 							</li>
-						</template>
+						</ul>
 					</li>
 				</ul>
 			</aside>
@@ -129,6 +138,7 @@
 			}
 		},
 		mounted() {
+		    // console.log(this.$router)
 			var user = sessionStorage.getItem('user');
 			if (user) {
 				user = JSON.parse(user);
@@ -142,7 +152,7 @@
 </script>
 
 <style scoped lang="scss">
-	@import '~scss_vars';
+	@import '../styles/common';
 	
 	.container {
 		position: absolute;

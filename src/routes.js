@@ -1,16 +1,9 @@
 import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
-import Main from './views/Main.vue'
 import SalesPlan from './views/nav1/SalesPlan.vue'
-import SalesGoods from './views/nav1/SalesGoods.vue'
-import SalesChannel from './views/nav1/SalesChannel.vue'
-import Table from './views/nav1/Table.vue'
-import Form from './views/nav1/Form.vue'
-import user from './views/nav1/user.vue'
-import Page4 from './views/nav2/Page4.vue'
-import Page5 from './views/nav2/Page5.vue'
-import Page6 from './views/nav3/Page6.vue'
+import SalesGoods from './views/nav3/SalesGoods.vue'
+import Advertisement from './views/nav2/Advertisement.vue'
 import echarts from './views/charts/echarts.vue'
 
 let routes = [
@@ -26,17 +19,36 @@ let routes = [
         name: '',
         hidden: true
     },
-    //{ path: '/main', component: Main },
     {
         path: '/',
         component: Home,
-        name: '营销管理',
+        name: '营销计划管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/salesPlan', component: SalesPlan, name: '营销计划' },
-            { path: '/salesChannel', component: SalesChannel, name: '营销渠道' },
-            { path: '/salesGoods', component: SalesGoods, name: '营销商品' },
+            {
+                path: '/salesPlan', component: SalesPlan, name: '营销计划管理'
+            },
+
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '广告管理',
+        iconCls: 'el-icon-more',//图标样式class
+        children: [
+            { path: '/advertisement', component: Advertisement, name: '广告管理' },
+        ]
+    },
+
+    {
+        path: '/',
+        component: Home,
+        name: '营销商品管理',
+        iconCls: 'el-icon-menu',//图标样式class
+        children: [
+            { path: '/goods', component: SalesGoods, name: '商品管理' },
+            { path: '/goodsCollection', component: SalesGoods, name: '商品集合管理' },
         ]
     },
     // {
